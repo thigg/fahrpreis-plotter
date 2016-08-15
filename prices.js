@@ -1,3 +1,4 @@
+#!/usr/local/bin/node
 'use strict'
 
 const minimist = require('minimist')
@@ -10,43 +11,25 @@ const autocomplete = require('cli-autocomplete')
 const so = require('so')
 const prices = require('db-prices')
 
+const where = require('./where')
 const render = require('./render')
 
 const argv = minimist(process.argv.slice(2))
 
 
 
-const suggest = (input) => new Promise((yay, nay) => {
-	if (!input) return yay([])
+if (argv.help || argv.h) {
+	process.stdout.write(`\
+Usage: db-prices [from] [to] [options]
 
-	input = normalize(input)
-	const match = (station) =>
-		normalize(station.name).indexOf(input) >= 0
+Arguments:
+    from            Station number (e.g. 8011160).
+    to              Station number (e.g. 8000261).
 
-	const stream = pipe(
-		  stations()
-		, filter(match, {objectMode: true})
-		, map.obj((s) => ({value: s.id, title: s.name}))
-	)
-
-	const results = []
-	const onResult = (s) => {
-		results.push(s)
-		if (results.length === 5) {
-			stream.end()
-			stream.removeListener('data', onResult)
-			yay(results)
-		}
-	}
-	stream.once('error', nay)
-	stream.on('end', () => yay(results))
-	stream.on('data', onResult)
-})
-
-const where = (msg) => new Promise((yay, nay) =>
-	autocomplete(msg, suggest)
-	.once('error', nay)
-	.once('submit', yay))
+Options:
+    --days      -d  The number of days to show. Default: 7`)
+    process.exit(0)
+}
 
 
 
@@ -61,8 +44,8 @@ so(function* () {
 		: yield where('To where?')
 
 	const now = new Date()
-	const days = new Array(argv.days || 7)
-		.fill(null, 0, argv.days || 7)
+	const days = new Array(argv.days || argv.d || 7)
+		.fill(null, 0, argv.days || argv.d || 7)
 		.map((_, i) => new Date(now.getYear(), now.getMonth(), now.getDate() + i + 1))
 
 	const byDay = yield Promise.all(days

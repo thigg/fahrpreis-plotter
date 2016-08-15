@@ -18,7 +18,7 @@ const day = (day) => {
 	if (!day) return null
 	return [
 		moment(day.trips[0].start).format('ddd DD'),
-		chalk.bold.cyan(day.offer.price),
+		chalk.bold.cyan(day.offer.price + '€'),
 		chalk.gray(day.trips
 			.map((trip) => moment(trip.start).format('hh:mm'))
 			.join(' '))
