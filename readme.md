@@ -6,8 +6,7 @@
 [![build status](https://img.shields.io/travis/derhuerst/db-prices-cli.svg)](https://travis-ci.org/derhuerst/db-prices-cli)
 [![dependency status](https://img.shields.io/david/derhuerst/db-prices-cli.svg)](https://david-dm.org/derhuerst/db-prices-cli)
 [![dev dependency status](https://img.shields.io/david/dev/derhuerst/db-prices-cli.svg)](https://david-dm.org/derhuerst/db-prices-cli#info=devDependencies)
-
-*db-prices-cli* [is ISC-licensed](license.md).
+![ISC-licensed](https://img.shields.io/github/license/derhuerst/db-prices-cli.svg)
 
 
 
