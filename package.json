@@ -1,0 +1,17 @@
+{
+	"name":         "db-prices-cli",
+	"description":  "Check prices for a DB route.",
+	"version":      "0.1.0",
+	"bin":          "prices.js",
+	"main":         "index.js",
+	"files":        ["index.js", "prices.js"],
+	"author":       "Jannis R <mail@jannisr.de>",
+	"homepage":     "https://github.com/derhuerst/db-prices-cli",
+	"repository":   "derhuerst/db-prices-cli",
+	"bugs":         "https://github.com/derhuerst/db-prices-cli/issues",
+	"license":      "ISC",
+	"preferGlobal": true,
+	"engines" :     {"node": ">=4"},
+	"bin":          {"prices": "prices.js"},
+	"keywords":     ["prices", "db", "deutsche", "bahn", "german", "railways"]
+}
