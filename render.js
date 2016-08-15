@@ -1,7 +1,8 @@
 'use strict'
 
-const Table = require('cli-table2')
+const chalk = require('chalk')
 const moment = require('moment')
+const Table = require('cli-table2')
 
 const table = () => new Table({
 	chars: {
@@ -17,7 +18,10 @@ const day = (day) => {
 	if (!day) return null
 	return [
 		moment(day.trips[0].start).format('ddd DD'),
-		day.offer.price
+		chalk.bold.cyan(day.offer.price),
+		chalk.gray(day.trips
+			.map((trip) => moment(trip.start).format('hh:mm'))
+			.join(' '))
 	]
 }
 
