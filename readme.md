@@ -22,7 +22,16 @@ npm install -g db-prices-cli
 
 ## Usage
 
-todo
+```
+Usage: db-prices [from] [to] [options]
+
+Arguments:
+    from            Station number (e.g. 8011160).
+    to              Station number (e.g. 8000261).
+
+Options:
+    --days      -d  The number of days to show. Default: 7
+```
 
 
 ## Contributing
