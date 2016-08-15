@@ -13,5 +13,11 @@
 	"preferGlobal": true,
 	"engines" :     {"node": ">=4"},
 	"bin":          {"prices": "prices.js"},
-	"keywords":     ["prices", "db", "deutsche", "bahn", "german", "railways"]
+	"keywords":     ["prices", "db", "deutsche", "bahn", "german", "railways"],
+	"dependencies": {
+		"minimist": "^1.2",
+		"db-prices": "^0.1.1",
+		"cli-table2": "^0.2",
+		"moment": "^2.14.1"
+	}
 }
