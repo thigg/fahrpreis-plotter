@@ -2,6 +2,8 @@
 
 **Check prices for a DB route.**
 
+[![asciicast](https://asciinema.org/a/82885.png)](https://asciinema.org/a/82885)
+
 [![npm version](https://img.shields.io/npm/v/db-prices-cli.svg)](https://www.npmjs.com/package/db-prices-cli)
 [![build status](https://img.shields.io/travis/derhuerst/db-prices-cli.svg)](https://travis-ci.org/derhuerst/db-prices-cli)
 [![dependency status](https://img.shields.io/david/derhuerst/db-prices-cli.svg)](https://david-dm.org/derhuerst/db-prices-cli)
