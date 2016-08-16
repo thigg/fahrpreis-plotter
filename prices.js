@@ -46,7 +46,7 @@ so(function* () {
 	const now = new Date()
 	const days = new Array(argv.days || argv.d || 7)
 		.fill(null, 0, argv.days || argv.d || 7)
-		.map((_, i) => new Date(now.getYear(), now.getMonth(), now.getDate() + i + 1))
+		.map((_, i) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + i + 1))
 
 	const byDay = yield Promise.all(days
 		.map((when) => prices(from, to, when)))
