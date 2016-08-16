@@ -48,8 +48,10 @@ so(function* () {
 		.fill(null, 0, argv.days || argv.d || 7)
 		.map((_, i) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + i + 1))
 
-	const byDay = yield Promise.all(days
-		.map((when) => prices(from, to, when)))
+	const byDay = yield Promise.all(days.map((when) =>
+		prices(from, to, when).then((results) =>
+			results.sort((a, b) => a.offer.price - b.offer.price)[0])
+	))
 	process.stdout.write(render(byDay) + '\n')
 	process.exit()
 

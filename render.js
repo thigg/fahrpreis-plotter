@@ -28,7 +28,6 @@ const day = (day) => {
 const days = (days) => {
 	const t = table()
 	days
-		.map((d) => d.sort((a, b) => a.offer.price - a.offer.price)[0]) // find cheapest
 		.map(day).filter((line) => !!line)
 		.forEach((line) => t.push(line))
 	return t.toString()
