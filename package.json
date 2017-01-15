@@ -25,5 +25,9 @@
 		"chalk": "^1.1.3",
 		"moment": "^2.14.1",
 		"cli-table2": "^0.2"
+	},
+	"scripts": {
+		"test": "./prices.js 8011160 8000261 --days 1",
+		"prepublish": "npm test"
 	}
 }
