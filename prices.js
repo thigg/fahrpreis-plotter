@@ -2,12 +2,6 @@
 'use strict'
 
 const minimist = require('minimist')
-const normalize = require('normalize-for-search')
-const pipe = require('multipipe')
-const stations = require('db-stations')
-const filter = require('stream-filter')
-const map = require('through2-map')
-const autocomplete = require('cli-autocomplete')
 const so = require('so')
 const prices = require('db-prices')
 
