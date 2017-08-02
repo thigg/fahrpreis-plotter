@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 'use strict'
 
-const minimist = require('minimist')
+const mri = require('mri')
 const so = require('so')
 const prices = require('db-prices')
 
 const where = require('./where')
 const render = require('./render')
 
-const argv = minimist(process.argv.slice(2))
+const argv = mri(process.argv.slice(2), {
+	boolean: ['help', 'h']
+})
 
 
 
