@@ -1,17 +1,32 @@
 {
-	"name":         "db-prices-cli",
-	"description":  "Check prices for a DB route.",
-	"version":      "0.2.1",
-	"files":        ["render.js", "where.js", "prices.js"],
-	"bin":          {"db-prices": "prices.js"},
-	"author":       "Jannis R <mail@jannisr.de>",
-	"homepage":     "https://github.com/derhuerst/db-prices-cli",
-	"repository":   "derhuerst/db-prices-cli",
-	"bugs":         "https://github.com/derhuerst/db-prices-cli/issues",
-	"license":      "ISC",
+	"name": "db-prices-cli",
+	"description": "Check prices for a DB route.",
+	"version": "0.2.1",
+	"files": [
+		"render.js",
+		"where.js",
+		"prices.js"
+	],
+	"bin": {
+		"db-prices": "prices.js"
+	},
+	"author": "Jannis R <mail@jannisr.de>",
+	"homepage": "https://github.com/derhuerst/db-prices-cli",
+	"repository": "derhuerst/db-prices-cli",
+	"bugs": "https://github.com/derhuerst/db-prices-cli/issues",
+	"license": "ISC",
 	"preferGlobal": true,
-	"engines" :     {"node": ">=6"},
-	"keywords":     ["prices", "db", "deutsche", "bahn", "german", "railways"],
+	"engines": {
+		"node": ">=6"
+	},
+	"keywords": [
+		"prices",
+		"db",
+		"deutsche",
+		"bahn",
+		"german",
+		"railways"
+	],
 	"dependencies": {
 		"chalk": "^1.1.3",
 		"cli-autocomplete": "^0.4",
