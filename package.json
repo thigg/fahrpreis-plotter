@@ -1,7 +1,7 @@
 {
 	"name":         "db-prices-cli",
 	"description":  "Check prices for a DB route.",
-	"version":      "0.2.0",
+	"version":      "0.2.1",
 	"files":        ["render.js", "where.js", "prices.js"],
 	"bin":          {"db-prices": "prices.js"},
 	"author":       "Jannis R <mail@jannisr.de>",
