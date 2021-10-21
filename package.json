@@ -1,7 +1,7 @@
 {
 	"name": "db-prices-cli",
 	"description": "Check prices for a DB route.",
-	"version": "0.2.1",
+	"version": "1.0.0",
 	"files": [
 		"render.js",
 		"where.js",
@@ -33,11 +33,10 @@
 		"cli-table2": "^0.2",
 		"db-prices": "^3.0.3",
 		"db-stations": "^4.1.0",
+		"db-stations-autocomplete": "^3.0.1",
 		"moment": "^2.14.1",
 		"mri": "^1.1.0",
-		"normalize-for-search": "^2.0.1",
-		"stream-filter": "^2.1.0",
-		"through2-map": "^3.0.0"
+		"normalize-for-search": "^2.0.1"
 	},
 	"devDependencies": {
 		"eslint": "^8.0.1"

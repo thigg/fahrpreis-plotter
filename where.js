@@ -1,31 +1,48 @@
 'use strict'
 
-const normalize = require('normalize-for-search')
-const stations = require('db-stations')
-const filter = require('stream-filter')
-const map = require('through2-map')
-const autocomplete = require('cli-autocomplete')
+const readStations = require('db-stations')
+const autocompleteDbStations = require('db-stations-autocomplete')
+const promptAutocomplete = require('cli-autocomplete')
 
+const pStations = new Promise((resolve, reject) => {
+	const res = Object.create(null)
+	readStations()
+	.on('data', (s) => {
+		res[s.id] = s
+	})
+	.once('end', () => {
+		resolve(res)
+	})
+	.once('error', reject)
+})
 
+const suggest = (input) => {
+	return pStations
+	.then((stationsById) => {
+		const results = autocompleteDbStations(input, 5)
+		const choices = []
 
-const suggest = async (input) => {
-	if (!input) return []
+		for (let result of results) {
+			const station = stationsById[result.id]
+			if (!station) continue
 
-	input = normalize(input)
+			choices.push({
+				title: [
+					station.name,
+					'–',
+					'score:', result.score.toFixed(3),
+					'relevance:', result.relevance.toFixed(3)
+				].join(' '),
+				value: station.id
+			})
+		}
 
-	const results = []
-	for await (const s of stations()) {
-		if (normalize(s.name).indexOf(input) < 0) continue
-
-		results.push({value: s.id, title: s.name})
-		if (results.length === 5) break
-	}
-
-	return results
+		return choices
+	})
 }
 
 const where = (msg) => new Promise((yay, nay) =>
-	autocomplete(msg, suggest)
+	promptAutocomplete(msg, suggest)
 	.once('error', nay)
 	.once('submit', yay))
 
