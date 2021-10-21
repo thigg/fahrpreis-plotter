@@ -17,10 +17,10 @@ const table = () => new Table({
 const day = (day) => {
 	if (!day) return null
 	return [
-		moment(day.trips[0].start).format('ddd DD'),
-		chalk.bold.cyan(day.offer.price + '€'),
-		chalk.gray(day.trips
-			.map((trip) => moment(trip.start).format('hh:mm'))
+		moment(day.legs[0].departure).format('ddd DD'),
+		chalk.bold.cyan(day.price.amount + '€'),
+		chalk.gray(day.legs
+			.map((leg) => moment(leg.departure).format('hh:mm'))
 			.join(' '))
 	]
 }

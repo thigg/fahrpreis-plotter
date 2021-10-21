@@ -29,27 +29,29 @@ Options:
 
 
 
-so(function* () {
+(async () => {
 
 	const from = /[0-9]+/.test(argv._[0])
 		? +argv._[0]
-		: yield where('From where?')
+		: await where('From where?')
 
 	const to = /[0-9]+/.test(argv._[1])
 		? +argv._[1]
-		: yield where('To where?')
+		: await where('To where?')
 
 	const now = new Date()
 	const days = new Array(argv.days || argv.d || 7)
 		.fill(null, 0, argv.days || argv.d || 7)
 		.map((_, i) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + i + 1))
 
-	const byDay = yield Promise.all(days.map((when) =>
-		prices(from, to, when).then((results) =>
-			results.sort((a, b) => a.offer.price - b.offer.price)[0])
-	))
+	const byDay = await Promise.all(days.map(async (when) => {
+		const res = await prices(from, to, when)
+		return res.sort((a, b) => a.price.amount - b.price.amount)[0]
+	}))
 	process.stdout.write(render(byDay) + '\n')
-	process.exit()
 
 })()
-.catch(console.error)
+.catch((err) => {
+	console.error(err)
+	process.exit(1)
+})
