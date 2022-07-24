@@ -1,0 +1,9 @@
+[Unit]
+Description=get fahrpreise
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/fahrpreise/dist/index.js %%START_STATION %%DEST_STATION --renderer db --days 90 --destfolder /var/fahrpreise/
+User=fahrpreise
+[Install]
+WantedBy=default.target

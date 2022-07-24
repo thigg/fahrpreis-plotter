@@ -18,16 +18,16 @@ const day = (day) => {
 	if (!day) return null
 	return [
 		moment(day.legs[0].departure).format('ddd DD'),
-		chalk.bold.cyan(day.price.amount + '€'),
-		chalk.gray(day.legs
+		day.price.amount + '€',
+		day.legs
 			.map((leg) => moment(leg.departure).format('hh:mm'))
-			.join(' '))
+			.join(' ')
 	]
 }
 
 const days = (days) => {
 	const t = table()
-	days
+	days.flat(1)
 		.map(day).filter((line) => !!line)
 		.forEach((line) => t.push(line))
 	return t.toString()

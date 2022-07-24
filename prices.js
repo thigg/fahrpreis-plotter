@@ -7,15 +7,16 @@ const prices = require('db-prices')
 
 const where = require('./where')
 const render = require('./render')
+const dbrender = require('./dbrenderer')
+
 
 const argv = mri(process.argv.slice(2), {
-	boolean: ['help', 'h']
+    boolean: ['help', 'h']
 })
 
 
-
 if (argv.help || argv.h) {
-	process.stdout.write(`\
+    process.stdout.write(`\
 Usage: db-prices [from] [to] [options]
 
 Arguments:
@@ -28,30 +29,36 @@ Options:
 }
 
 
-
 (async () => {
 
-	const from = /[0-9]+/.test(argv._[0])
-		? +argv._[0]
-		: await where('From where?')
+    const from = /[0-9]+/.test(argv._[0])
+        ? +argv._[0]
+        : await where('From where?')
 
-	const to = /[0-9]+/.test(argv._[1])
-		? +argv._[1]
-		: await where('To where?')
+    const to = /[0-9]+/.test(argv._[1])
+        ? +argv._[1]
+        : await where('To where?')
 
-	const now = new Date()
-	const days = new Array(argv.days || argv.d || 7)
-		.fill(null, 0, argv.days || argv.d || 7)
-		.map((_, i) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + i + 1))
+    const renderer = argv.renderer || "console"
 
-	const byDay = await Promise.all(days.map(async (when) => {
-		const res = await prices(from, to, when)
-		return res.sort((a, b) => a.price.amount - b.price.amount)[0]
-	}))
-	process.stdout.write(render(byDay) + '\n')
+    const now = new Date()
+    const days = new Array(argv.days || argv.d || 7)
+        .fill(null, 0, argv.days || argv.d || 7)
+        .map((_, i) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + i + 1))
+
+    const byDay = await Promise.all(days.map(async (when) => {
+        const res = await prices(from, to, when)
+        return res.sort((a, b) => a.price.amount - b.price.amount)
+    }))
+    if (renderer === "console")
+        process.stdout.write(render(byDay) + '\n')
+    else if (renderer === "db") {
+        dbrender(byDay, from, to , argv.destfolder || "./");
+        process.stdout.write('wrote to db')
+    } else throw 'unknown renderer ' +renderer
 
 })()
-.catch((err) => {
-	console.error(err)
-	process.exit(1)
-})
+    .catch((err) => {
+        console.error(err)
+        process.exit(1)
+    })

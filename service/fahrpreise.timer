@@ -1,0 +1,12 @@
+[Unit]
+Description=query fahrpreise
+RefuseManualStart=no  # Allow manual starts
+
+[Timer]
+Persistent=true
+OnBootSec=195
+OnUnitActiveSec=2hr
+Unit=fahrpreise.service
+
+[Install]
+WantedBy=timers.target

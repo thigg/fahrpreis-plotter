@@ -1,6 +1,6 @@
 {
-	"name": "db-prices-cli",
-	"description": "Check prices for a DB route.",
+	"name": "fahrpreise",
+	"description": "Collect and plot collection prices over time",
 	"version": "1.0.0",
 	"files": [
 		"render.js",
@@ -10,10 +10,10 @@
 	"bin": {
 		"db-prices": "prices.js"
 	},
-	"author": "Jannis R <mail@jannisr.de>",
-	"homepage": "https://github.com/derhuerst/db-prices-cli",
-	"repository": "derhuerst/db-prices-cli",
-	"bugs": "https://github.com/derhuerst/db-prices-cli/issues",
+	"author": "thigg",
+	"homepage": "https://github.com/thigg/fahrpreis-plotter",
+	"repository": "thigg/fahrpreis-plotter",
+	"bugs": "https://github.com/thigg/fahrpreis-plotter/issues",
 	"license": "ISC",
 	"preferGlobal": true,
 	"engines": {
@@ -25,7 +25,8 @@
 		"deutsche",
 		"bahn",
 		"german",
-		"railways"
+		"railways",
+		"fahrpreise"
 	],
 	"dependencies": {
 		"chalk": "^4.1.2",
@@ -39,11 +40,13 @@
 		"normalize-for-search": "^2.0.1"
 	},
 	"devDependencies": {
-		"eslint": "^8.0.1"
+		"eslint": "^8.0.1",
+		"@vercel/ncc": "^0.34.0"
 	},
 	"scripts": {
 		"lint": "eslint .",
 		"test": "./prices.js 8011160 8000261 --days 1",
-		"prepublishOnly": "npm run lint && npm test"
+		"prepublishOnly": "npm run lint && npm test",
+		"prodbuild": "ncc build prices.js -o dist --target es2021"
 	}
 }
