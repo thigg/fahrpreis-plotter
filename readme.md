@@ -23,16 +23,25 @@ I run the service on a raspberry and do the plots from my laptop. I mount the da
 to my laptop with `mkdir /tmp/fahrpreise && sshfs raspberry:/var/fahrpreise /tmp/fahrpreise`.
 ### run service
  1. build this tool with `npm run prodbuild`
- 2. create a user fahrpreise
- 3. install the files from [service](service) to `/etc/systemd/system/` and modify them as needed (replace the entries prefixed with `%%`)
- 4. create /var/fahrpreise and grant access to the fahrpreise user
- 5. `sudo systemctl daemon-reload && sudo systemctl enable --now fahrpreise` to enable the service
- 6. This collects now every few hours (see timer definition file) the connection prices
- 7. In /var/fahrpreise  are for each capture run  the files with date of capture and stations compressed with brotli for minimal filesize
+ 5. create `/var/fahrpreise`, `/opt/fahrpreise` and `/etc/fahrpreise/connections.json` and grant access to the fahrpreise user
+ 2. move the files from dist to `/opt/fahrpreise/`
+ 3. create a user fahrpreise
+ 4. install the files from [service](service) to `/etc/systemd/system/`
+ 6. create `/etc/fahrpreise/connections.json` with the connections you want to monitor.
+ Format:
+ ```json
+[
+  [start, destination],...
+]
+```
+
+ 7. `sudo systemctl daemon-reload && sudo systemctl enable --now fahrpreise` to enable the service
+ 8. This collects now every few hours (see timer definition file) the connection prices
+ 9. In /var/fahrpreise  are for each capture run  the files with date of capture and stations compressed with brotli for minimal filesize
 ### plot
  1. mount the datafoler (see above)
  2. run `plotter/main.py` (install dependencies before?)
- 3. for development of the plotter you can set the accufile parameter so you dont need to accumulate data for every testrun
+ 3. for development of the plotter you can set the accufile parameter so you dont need to accumulate data for every test
 
 # Contributing
 For questions/issues use the issue tracker. Feel free to create pull requests with your modifications.

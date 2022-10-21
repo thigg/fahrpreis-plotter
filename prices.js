@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 'use strict'
 
+
+const fsPromises = require('fs/promises')
 const mri = require('mri')
-const so = require('so')
 const prices = require('db-prices')
 
 const where = require('./where')
@@ -31,14 +32,22 @@ Options:
 
 (async () => {
 
-    const from = /[0-9]+/.test(argv._[0])
-        ? +argv._[0]
-        : await where('From where?')
+    let connections = []
+    if (!argv.connectionfile) {
+        const from = /[0-9]+/.test(argv._[0])
+            ? +argv._[0]
+            : await where('From where?')
 
-    const to = /[0-9]+/.test(argv._[1])
-        ? +argv._[1]
-        : await where('To where?')
-
+        const to = /[0-9]+/.test(argv._[1])
+            ? +argv._[1]
+            : await where('To where?')
+        connections[0] = [from, to];
+    } else {
+        const data = await fsPromises.readFile(argv.connectionfile);
+        connections = JSON.parse(data);
+        if (connections.length === 0) throw ("input connection file has no connections")
+        if (connections.find(value => value.length !== 2)) throw("input file connections do not all have exactly 2 elements")
+    }
     const renderer = argv.renderer || "console"
 
     const now = new Date()
@@ -46,17 +55,20 @@ Options:
         .fill(null, 0, argv.days || argv.d || 7)
         .map((_, i) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + i + 1))
 
-    const byDay = await Promise.all(days.map(async (when) => {
-        const res = await prices(from, to, when)
-        return res.sort((a, b) => a.price.amount - b.price.amount)
-    }))
-    if (renderer === "console")
-        process.stdout.write(render(byDay) + '\n')
-    else if (renderer === "db") {
-        dbrender(byDay, from, to , argv.destfolder || "./");
-        process.stdout.write('wrote to db')
-    } else throw 'unknown renderer ' +renderer
-
+    for (let connection of connections) {
+        const from = connection[0];
+        const to = connection[1];
+        const byDay = await Promise.all(days.map(async (when) => {
+            const res = await prices(from, to, when)
+            return res.sort((a, b) => a.price.amount - b.price.amount)
+        }))
+        if (renderer === "console")
+            process.stdout.write(render(byDay) + '\n')
+        else if (renderer === "db") {
+            dbrender(byDay, from, to, argv.destfolder || "./");
+            process.stdout.write(`wrote ${from} to ${to} to db\n`)
+        } else throw 'unknown renderer ' + renderer
+    }
 })()
     .catch((err) => {
         console.error(err)

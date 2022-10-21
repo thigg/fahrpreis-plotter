@@ -31,7 +31,9 @@ const suggest = (input) => {
 					station.name,
 					'–',
 					'score:', result.score.toFixed(3),
-					'relevance:', result.relevance.toFixed(3)
+					'relevance:', result.relevance.toFixed(3),
+					'stationcode:', station.id
+
 				].join(' '),
 				value: station.id
 			})
