@@ -1,0 +1,27 @@
+{
+  "name": "gatherer_hafas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fetchBestPrices.mjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thigg/fahrpreis-plotter.git"
+  },
+  "bin": {
+    "db-prices": "fetchBestPrices.mjs"
+  },
+  "dependencies": {
+    "hafas-client": "github:thigg/hafas-client#add-BestPriceSearch",
+    "luxon": "^3.4.4",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.1"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "fetchBestPrices.mjs 8011160 8000261 30 /tmp/db.sqlite3",
+    "prepublishOnly": "npm run lint && npm test"
+  },
+  "private": true
+}
