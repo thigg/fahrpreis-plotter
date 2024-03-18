@@ -1,0 +1,6 @@
+#!/bin/bash
+while IFS=';' read -r from to || [ -n "$from" ]; do
+    echo "connection between $from and $to"
+    /usr/bin/node /opt/fahrpreis_gatherer/fetchBestPrices.mjs "$from" "$to" 60 {{ db_file }}
+done < "/opt/fahrpreis_gatherer/stations.csv"
+

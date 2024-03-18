@@ -1,0 +1,71 @@
+---
+- name: Install Node.js 22.x
+  block:
+    - name: Import the NodeSource Node.js repository signing key
+      ansible.builtin.apt_key:
+        url:  https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+        state: present
+
+    - name: Add the NodeSource Node.js
+      ansible.builtin.apt_repository:
+        repo: "deb https://deb.nodesource.com/node_21.x nodistro main"
+        state: present
+        update_cache: yes
+
+    - name: Install Node.js
+      ansible.builtin.apt:
+        name:
+          - nodejs
+          - npm
+        state: present
+        update_cache: yes
+
+
+- name: Create a user for the Node.js application
+  ansible.builtin.user:
+    name: fahrpreis_gatherer
+    system: yes
+    home: "/opt/fahrpreis_gatherer"
+
+- name: Ensure the application directory exists
+  ansible.builtin.file:
+    path: "/opt/fahrpreis_gatherer"
+    state: directory
+    owner: fahrpreis_gatherer
+    group: fahrpreis_gatherer
+
+- name: Copy the Node.js application to the server
+  ansible.builtin.copy:
+    src: "{{ role_path }}/../gatherer_hafas/"
+    dest: "/opt/fahrpreis_gatherer"
+    owner: fahrpreis_gatherer
+    group: fahrpreis_gatherer
+    mode: '0755'
+- name: Install Node.js application dependencies with npm
+  ansible.builtin.command:
+    cmd: npm install
+    chdir: /opt/fahrpreis_gatherer
+  become: yes
+  become_user: fahrpreis_gatherer
+
+- name: Deploy the run script
+  ansible.builtin.template:
+    src: "run.sh.j2"
+    dest: "/opt/fahrpreis_gatherer/run.sh"
+    mode: 'o=rx'
+
+- name: Deploy the systemd service template
+  ansible.builtin.template:
+    src: "fahrpreis_gatherer.service.j2"
+    dest: "/etc/systemd/system/fahrpreis_gatherer.service"
+
+- name: Deploy the systemd timer template
+  ansible.builtin.template:
+    src: "fahrpreis_gatherer.timer.j2"
+    dest: "/etc/systemd/system/fahrpreis_gatherer.timer"
+
+- name: Enable and start the timer
+  ansible.builtin.systemd:
+    name: fahrpreis_gatherer.timer
+    enabled: yes
+    state: started
