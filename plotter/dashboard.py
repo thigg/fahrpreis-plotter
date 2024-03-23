@@ -16,7 +16,7 @@ app = dash.Dash(__name__)
     [Input('x-input', 'value')]
 )
 def update_plot(x):
-    conn, cursor = open_sqlite("/tmp/fahrpreise.sqlite3")
+    conn, cursor = open_sqlite(args.dbfile)
 
     station1, station2 = x.split("-")
     timeframe_start, timeframe_end = get_timeframe(60, 10)
@@ -47,5 +47,4 @@ if __name__ == '__main__':
         ], style={'width': '100%', 'display': 'inline-block'}),
         dcc.Graph(id='output-plot', style={'height': 'calc(100vh - 150px)'})
     ], style={'height': '100vh'})
-
-    app.run_server(debug=True)
+    app.run(debug=True)
