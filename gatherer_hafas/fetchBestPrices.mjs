@@ -7,12 +7,6 @@ import sqlite3 from 'sqlite3';
 const {Database, verbose} = sqlite3;
 verbose();
 
-let args_array = process.argv.slice(2)
-let args = {"fromName":args_array[0],"toName":args_array[1],"days":args_array[2],"dbFile":args_array[3]}
-
-const userAgent = 'github.com/thigg/fahrpreis-plotter'
-
-const client = createClient(dbProfile, userAgent)
 
 async function getFromTo(from, to) {
     let loc1 = await client.locations(from)
@@ -22,19 +16,20 @@ async function getFromTo(from, to) {
     return {from_id, to_id};
 }
 
-let {from_id, to_id} = await getFromTo(args.fromName, args.toName);
-
-let now = DateTime.now()
 
 async function queryPrices(from, to, now, number_of_days) {
     let all_prices = []
     for (let day_offset = 0; day_offset < number_of_days; day_offset++) {
         let query_day = now.plus(Duration.fromObject({days: day_offset}))
         let prices = await client.bestPrices(from, to, query_day.toJSDate())
+        if (!prices.bestPrices)
+            continue
         let compact_prices = prices.bestPrices
+            .filter(d => d && d.journeys && d.journeys.length > 0)
             .map(d => ({
                 "when": d.fromDate,
-                "price": d.bestPrice?.amount
+                "price": d.bestPrice?.amount,
+                "duration": new Date(d.journeys[0].legs[d.journeys[0].legs.length - 1].plannedArrival) - new Date(d.journeys[0].legs[0].plannedDeparture)
             })).filter(d => d.price !== undefined)
         all_prices = all_prices.concat(compact_prices)
 
@@ -42,17 +37,25 @@ async function queryPrices(from, to, now, number_of_days) {
     return all_prices;
 }
 
-let all_prices = await queryPrices(from_id, to_id, now, args.days);
 
-function persistPrices(from, to, allPrices, queried_at, db_path) {
-    let from_int = parseInt(from);
-    let to_int = parseInt(to);
-    let db = new sqlite3.Database(db_path, (err) => {
+function persist_station(db, station_id, station_name) {
+    const check_station_stmt = db.prepare("Select 1 from `stations` where `number` = ? and `name` = ?;");
+    const insert_station_stmt = db.prepare("insert into `stations` (`number`,`name`) values (?,?);");
+    check_station_stmt.get([station_id, station_name], function (err, row) {
         if (err) {
             console.error(err)
             return console.error(err.message);
         }
+        if (!row) {
+            insert_station_stmt.run(station_id, station_name)
+        }
     });
+}
+
+function persistPrices(db, from, to, allPrices, queried_at) {
+    let from_int = parseInt(from);
+    let to_int = parseInt(to);
+
     db.serialize(() => {
 
         db.run('BEGIN TRANSACTION');
@@ -62,12 +65,14 @@ function persistPrices(from, to, allPrices, queried_at, db_path) {
                   \`to\` INT not null,
                   \`when\` DATETIME not null,
                   \`price_cents\` INT not null,
-                  \`queried_at\` datetime not null
+                  \`queried_at\` datetime not null,
+                  \`travel_duration\` INT not null DEFAULT -1
                 )`
         )
-        const stmt = db.prepare('INSERT INTO fahrpreise (`from`,`to`,`when`,`price_cents`,`queried_at`) VALUES (?,?,?,?,?);');
+        const stmt = db.prepare('INSERT INTO fahrpreise (`from`,`to`,`when`,`price_cents`,`queried_at`,`travel_duration`) VALUES (?,?,?,?,?,?);');
         for (let data of allPrices) {
-            stmt.run(from_int, to_int, new Date(data.when), Math.trunc(data.price * 100), queried_at
+            stmt.run(
+                from_int, to_int, new Date(data.when), Math.trunc(data.price * 100), queried_at, data.duration
             )
         }
 
@@ -83,5 +88,31 @@ function persistPrices(from, to, allPrices, queried_at, db_path) {
     });
 }
 
-persistPrices(from_id, to_id, all_prices, now.toJSDate(), args.dbFile);
+let args_array = process.argv.slice(2)
+let args = {"fromName": args_array[0], "toName": args_array[1], "days": args_array[2], "dbFile": args_array[3]}
+
+const userAgent = 'github.com/thigg/fahrpreis-plotter'
+
+const client = createClient(dbProfile, userAgent)
+
+let db = new sqlite3.Database(args.dbFile, (err) => {
+    if (err) {
+        console.error(err)
+        return console.error(err.message);
+    }
+});
+let {from_id, to_id} = await getFromTo(args.fromName, args.toName);
+
+let now = DateTime.now()
+db.run(`CREATE TABLE IF NOT EXISTS \`stations\` (
+                  \`id\` integer not null primary key autoincrement,
+                  \`number\` INT not null,
+                  \`name\` TEXT not null
+                )`
+)
+persist_station(db, from_id, args.fromName)
+persist_station(db, to_id, args.toName)
+
+let all_prices = await queryPrices(from_id, to_id, now, args.days);
+persistPrices(db, from_id, to_id, all_prices, now.toJSDate());
 
