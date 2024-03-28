@@ -1,0 +1,20 @@
+[Unit]
+Description=Fahrpreis Plotter Service
+After=network.target
+
+[Service]
+User=fahrpreis-plotter
+Group=fahrpreis-plotter
+WorkingDirectory=/opt/fahrpreis-plotter
+ExecStart=/opt/fahrpreis-plotter/venv/bin/uwsgi -C --socket /run/fahrpreis-plotter/socket.sock --master -p 1 -w wsgi:server
+Restart=always
+# File system access restrictions
+ProtectSystem=strict
+ReadWritePaths=/run/fahrpreis-plotter/
+ReadOnlyPaths=/opt/fahrpreis-plotter /mnt/fahrpreise/fahrpreise.sqlite3
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

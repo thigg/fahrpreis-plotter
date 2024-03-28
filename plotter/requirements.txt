@@ -1,3 +1,4 @@
 plotly-express
 dash
 flask-caching
+pyuwsgi

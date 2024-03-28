@@ -1,0 +1,69 @@
+---
+- name: Ensure application user exists
+  ansible.builtin.user:
+    name: fahrpreis-plotter
+    groups: fahrpreis_gatherer
+    state: present
+
+- name: Ensure python3-venv is installed
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3-venv
+
+- name: Create a directory for the app
+  ansible.builtin.file:
+    path: /opt/fahrpreis-plotter
+    state: directory
+    owner: fahrpreis-plotter
+    group: fahrpreis-plotter
+
+- name: Copy the application code
+  ansible.builtin.copy:
+    src: "{{ role_path }}/../plotter/"
+    dest: /opt/fahrpreis-plotter
+    owner: fahrpreis-plotter
+    group: fahrpreis-plotter
+    remote_src: no
+
+- name: Create a Python virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /opt/fahrpreis-plotter/venv
+  args:
+    creates: "/opt/fahrpreis-plotter/venv"
+  become: yes
+  become_user: fahrpreis-plotter
+
+- name: Install dependencies using pip
+  ansible.builtin.command:
+    cmd: /opt/fahrpreis-plotter/venv/bin/pip install -r /opt/fahrpreis-plotter/requirements.txt
+  become: yes
+  become_user: fahrpreis-plotter
+
+- name: Create systemd-tmpfiles configuration
+  ansible.builtin.copy:
+    dest: "/etc/tmpfiles.d/fahrpreis-plotter.conf"
+    content: |
+      d /run/fahrpreis-plotter 0755 fahrpreis-plotter fahrpreis-plotter -
+    owner: "root"
+    group: "root"
+    mode: "0644"
+- name: Apply systemd-tmpfiles configuration
+  ansible.builtin.command:
+    cmd: "systemd-tmpfiles --create"
+
+- name: Deploy the systemd service file
+  ansible.builtin.template:
+    src: fahrpreis-plotter.service.j2
+    dest: /etc/systemd/system/fahrpreis-plotter.service
+- name: Deploy the config file
+  ansible.builtin.template:
+    src: fahrpreis-plotter-config.json.j2
+    dest: /etc/fahrpreis-plotter-config.json
+- name: start fahrpreis-plotter service
+  ansible.builtin.systemd:
+    name: fahrpreis-plotter
+    state: started
+    enabled: yes
+    daemon_reload: yes

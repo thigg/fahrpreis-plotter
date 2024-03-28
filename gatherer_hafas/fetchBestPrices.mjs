@@ -26,10 +26,11 @@ async function queryPrices(from, to, now, number_of_days) {
             continue
         let compact_prices = prices.bestPrices
             .filter(d => d && d.journeys && d.journeys.length > 0)
-            .map(d => ({
-                "when": d.fromDate,
-                "price": d.bestPrice?.amount,
-                "duration": new Date(d.journeys[0].legs[d.journeys[0].legs.length - 1].plannedArrival) - new Date(d.journeys[0].legs[0].plannedDeparture)
+            .flatMap(d=>d.journeys)
+            .map(journey => ({
+                "when": journey.legs[0].plannedDeparture,
+                "price": journey.price?.amount,
+                "duration": new Date(journey.legs[journey.legs.length - 1].plannedArrival) - new Date(journey.legs[0].plannedDeparture)
             })).filter(d => d.price !== undefined)
         all_prices = all_prices.concat(compact_prices)
 
@@ -58,6 +59,18 @@ function persistPrices(db, from, to, allPrices, queried_at) {
 
     db.serialize(() => {
 
+        /* duckdb schema
+        CREATE SEQUENCE id_sequence START 1;
+CREATE TABLE "fahrpreise" (
+                  "id" integer not null primary key DEFAULT nextval('id_sequence'),
+                  "from" INT not null,
+                  "to" INT not null,
+                  "when" LONG not null,
+                  "price_cents" INT not null,
+                  "queried_at" LONG not null
+                , "travel_duration" INT not null DEFAULT -1);
+
+         */
         db.run('BEGIN TRANSACTION');
         db.run(`CREATE TABLE IF NOT EXISTS \`fahrpreise\` (
                   \`id\` integer not null primary key autoincrement,
